@@ -4,6 +4,7 @@ import { createShell, homePath } from './ui/shell.js';
 import { toast } from './utils/ui.js';
 import { initTheme } from './utils/theme.js';
 import { createLoginView } from './views/login.js';
+import { createRegisterView } from './views/register.js';
 import { createCatalogView } from './views/catalog.js';
 import { createSellerProductsView } from './views/seller-products.js';
 import { createSellerCategoriesView } from './views/seller-categories.js';
@@ -22,6 +23,7 @@ const routes = [
   { path: '/produk', roles: ['seller'], title: 'Produk saya', view: createSellerProductsView },
   { path: '/kategori', roles: ['seller'], title: 'Kategori', view: createSellerCategoriesView },
   { path: '/katalog', roles: ['admin', 'seller', 'buyer'], title: 'Katalog', view: createCatalogView },
+  { path: '/register', roles: ['admin', 'seller', 'buyer'], title: 'Daftar', view: createRegisterView },
 ];
 
 let renderedPath = null;

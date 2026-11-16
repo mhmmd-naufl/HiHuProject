@@ -122,7 +122,7 @@ export function createShell({ user, path, view }) {
       createThemeToggle({ className: 'block' }),
       h(
         'button',
-        { class: 'btn outline sm block logout-btn', type: 'button', onClick: logout },
+        { class: 'btn outline sm block logout-btn', type: 'button', onClick: () => { if (window.confirm('Keluar dari HiHuJoki? Klik Cancel untuk tetap login.')) { logout() } } },
         h('span', { 'aria-hidden': 'true' }, icon('logout', { size: 15 })),
         'Keluar',
       ),
@@ -148,7 +148,7 @@ export function createShell({ user, path, view }) {
         ),
       ),
       createThemeToggle({ compact: true }),
-      h('button', { class: 'btn ghost sm', type: 'button', onClick: logout, 'aria-label': 'Keluar dari akun' }, h('span', { 'aria-hidden': 'true' }, icon('logout', { size: 15 }))),
+      h('button', { class: 'btn ghost sm', type: 'button', onClick: () => { if (window.confirm('Keluar dari HiHuJoki? Klik Cancel untuk tetap login.')) { logout() } }, 'aria-label': 'Keluar dari akun' }, h('span', { 'aria-hidden': 'true' }, icon('logout', { size: 15 }))),
     ),
   );
 

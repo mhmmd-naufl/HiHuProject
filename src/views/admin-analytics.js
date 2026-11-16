@@ -10,8 +10,6 @@ export function createAdminAnalyticsView(ctx) {
   const { views, waClicks } = store.analytics;
   const totalViews = sumValues(views);
   const totalClicks = sumValues(waClicks);
-  const ratio = totalViews ? Math.round((totalClicks / totalViews) * 100) : 0;
-
   const productName = (id) => store.products.find((product) => product.id === id)?.nama || 'Produk terhapus';
   const percent = (value, max) => `${Math.min((value / Math.max(max, 1)) * 100, 100)}%`;
 
@@ -97,31 +95,36 @@ export function createAdminAnalyticsView(ctx) {
       )
     : h('div', { class: 'empty', style: { border: '0', borderRadius: '0' } }, h('strong', null, 'Belum ada interaksi'), h('span', null, 'Distribusi kategori muncul setelah ada kunjungan.'));
 
-  const conversionRows = store.products
+  const revenueRows = store.products
     .map((product) => {
       const seen = Number(views[product.id]) || 0;
       const clicks = Number(waClicks[product.id]) || 0;
-      return { label: product.nama, seen, clicks, rate: seen ? Math.round((clicks / seen) * 100) : 0 };
+      const estimatedRevenue = seen ? Math.round((clicks / seen) * 10) : 0;
+      return { label: product.nama, seen, clicks, estimatedRevenue };
     })
-    .filter((row) => row.seen > 0 && row.clicks > 0)
-    .sort((a, b) => b.rate - a.rate || b.clicks - a.clicks)
+    .filter((row) => row.seen > 0)
+    .sort((a, b) => b.estimatedRevenue - a.estimatedRevenue || b.clicks - a.clicks)
     .slice(0, 5);
 
-  const conversionPanelBody = conversionRows.length
+  const revenuePanelBody = revenueRows.length
     ? h(
         'div',
         { class: 'chart' },
-        ...conversionRows.map((row) =>
+        h(
+          'div',
+          { class: 'chart-legend' },
+          h('span', { class: 'legend-item' }, h('span', { class: 'swatch', 'aria-hidden': 'true' }), 'Revenue')),
+        ...revenueRows.map((row) =>
           h(
             'div',
-            { class: 'bar-row', title: `${row.label}: ${number(row.clicks)} dari ${number(row.seen)} tayangan` },
+            { class: 'bar-row', title: `${row.label}: estimasi Rp${row.estimatedRevenue} per klik` },
             h('span', { class: 'bar-label' }, row.label),
-            h('span', { class: 'bar-track' }, h('span', { class: 'bar-fill accent', style: { width: `${Math.max(row.rate, 2)}%` } })),
-            h('span', { class: 'bar-value' }, `${row.rate}%`),
+            h('span', { class: 'bar-track' }, h('span', { class: 'bar-fill success', style: { width: `${Math.max(row.estimatedRevenue, 1)}%` } })),
+            h('span', { class: 'bar-value' }, `Rp${row.estimatedRevenue}K`),
           ),
         ),
       )
-    : h('div', { class: 'empty', style: { border: '0', borderRadius: '0' } }, h('strong', null, 'Belum ada klik WhatsApp'), h('span', null, 'Rasio kontak tampil setelah pembeli menghubungi seller.'));
+    : h('div', { class: 'empty', style: { border: '0', borderRadius: '0' } }, h('strong', null, 'Belum ada data'), h('span', null, 'Klik WhatsApp bisa dijual estimated Rp10K per interaksi'));
 
   async function resetAnalytics() {
     const ok = await confirmAction({
@@ -144,7 +147,7 @@ export function createAdminAnalyticsView(ctx) {
     { class: 'stats' },
     h('div', { class: 'stat accent' }, h('small', null, 'Tayangan produk'), h('strong', null, number(totalViews)), h('div', { class: 'stat-foot' }, 'Detail produk dibuka')),
     h('div', { class: 'stat' }, h('small', null, 'Klik WhatsApp'), h('strong', null, number(totalClicks)), h('div', { class: 'stat-foot' }, 'Pembeli menghubungi seller')),
-    h('div', { class: 'stat' }, h('small', null, 'Rasio kontak'), h('strong', null, `${number(ratio)}%`), h('div', { class: 'stat-foot' }, `${number(totalClicks)} dari ${number(totalViews)} tayangan`)),
+    h('div', { class: 'stat' }, h('small', null, 'Top produk'), h('strong', null, '—'), h('div', { class: 'stat-foot' }, '—')),
   );
 
   return h(
@@ -173,7 +176,7 @@ export function createAdminAnalyticsView(ctx) {
       'div',
       { class: 'split-2', style: { marginTop: '16px' } },
       h('div', { class: 'panel' }, h('div', { class: 'panel-head' }, h('h2', null, 'Distribusi kategori'), h('span', { class: 'small muted' }, 'porsi interaksi')), categoryPanelBody),
-      h('div', { class: 'panel' }, h('div', { class: 'panel-head' }, h('h2', null, 'Rasio kontak'), h('span', { class: 'small muted' }, 'klik ÷ tayangan')), conversionPanelBody),
+      h('div', { class: 'panel' }, h('div', { class: 'panel-head' }, h('h2', null, 'Top produk by revenue'), h('span', { class: 'small muted' }, 'estimasi pendapatan per klik')), revenuePanelBody),
     ),
     h('p', { class: 'notice', style: { marginTop: '16px' } }, 'Statistik dihitung dari aktivitas pada browser ini dan disimpan bersama data demo lainnya.'),
   );
