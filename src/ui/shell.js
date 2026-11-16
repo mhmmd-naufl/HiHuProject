@@ -121,31 +121,12 @@ export function createShell({ user, path, view }) {
       ),
       h(
         'button',
-        { class: 'btn outline sm block logout-btn', type: 'button', onClick: () => { if (window.confirm('Keluar dari HiHuJoki? Klik Cancel untuk tetap login.')) { logout() } } },
+        { class: 'btn outline sm block logout-btn', type: 'button', onClick: () => { if (window.confirm('Keluar dari HiHuJoki? Klik Cancel untuk tetap login.')) { if (window.confirm('Anda yakin ingin keluar dari HiHuJoki?')) { logout() } } } },
         h('span', { 'aria-hidden': 'true' }, icon('logout', { size: 15 })),
         'Keluar',
       ),
     ),
   );
-
-  const shell = h(
-    'div',
-    { class: 'app-shell' },
-    sidebar,
-    h(
-      'div',
-      { class: 'main' },
-      h(
-        'div',
-        { class: 'theme-wrapper' },
-        createThemeToggle({ className: 'block' }),
-      ),
-      mobileBar,
-      mobileNav,
-      h('main', { class: 'content' }, view),
-    ),
-  );
-
 
   const mobileBar = h(
     'div',
@@ -166,7 +147,7 @@ export function createShell({ user, path, view }) {
         ),
       ),
       createThemeToggle({ compact: true }),
-      h('button', { class: 'btn ghost sm', type: 'button', onClick: () => { if (window.confirm('Keluar dari HiHuJoki? Klik Cancel untuk tetap login.')) { logout() } }, 'aria-label': 'Keluar dari akun' }, h('span', { 'aria-hidden': 'true' }, icon('logout', { size: 15 }))),
+      h('button', { class: 'btn ghost sm', type: 'button', onClick: () => { if (window.confirm('Keluar dari HiHuJoki? Klik Cancel untuk tetap login.')) { if (window.confirm('Anda yakin ingin keluar dari HiHuJoki?')) { logout() } } }, 'aria-label': 'Keluar dari akun' }, h('span', { 'aria-hidden': 'true' }, icon('logout', { size: 15 }))),
     ),
   );
 

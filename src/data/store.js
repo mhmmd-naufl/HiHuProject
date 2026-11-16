@@ -257,6 +257,19 @@ export const store = {
     return { ok: true, user };
   },
 
+  register(draft) {
+    const created = this.createUser({
+      nama: draft.nama,
+      phone: draft.phone,
+      password: draft.password,
+      role: 'buyer',
+      aktif: true,
+    });
+    if (!created.ok) return created;
+    const loggedIn = this.login(created.user.phone, draft.password);
+    return loggedIn.ok ? loggedIn : created;
+  },
+
   logout() {
     state.session = null;
     try {

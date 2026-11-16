@@ -3,12 +3,23 @@ import { formatPhone, number, ROLE_LABEL } from '../utils/format.js';
 import { icon } from '../utils/icons.js';
 import { store } from '../data/store.js';
 import { DEMO_ACCOUNTS } from '../data/seed.js';
+import { toast } from '../utils/ui.js';
 import { homePath } from '../ui/shell.js';
 import { createThemeToggle } from '../ui/theme-toggle.js';
 
 export function createRegisterView() {
   const errorBox = h('div', { class: 'form-error', role: 'alert', hidden: true });
   let busy = false;
+
+  const nameInput = h('input', {
+    class: 'input',
+    id: 'reg-nama',
+    type: 'text',
+    name: 'nama',
+    autocomplete: 'name',
+    placeholder: 'Nama lengkap',
+    required: true,
+  });
 
   const phoneInput = h('input', {
     class: 'input',
@@ -73,23 +84,23 @@ export function createRegisterView() {
     submitLabel.textContent = value ? 'Membuat akun…' : 'Daftar';
   }
 
-  function attempt(phone, password) {
+  function attempt(nama, phone, password) {
     if (busy) return;
-    // Simpan user ke localStorage (mirip store.register)
     try {
-      const users = JSON.parse(localStorage.getItem('hihujoki.users.v2') || '{}');
-      const phoneNorm = phone.replace(/\s/g, '');
-      if (users[phoneNorm]) {
-        showError('Nomor HP sudah terdaftar. Silakan login.');
+      const result = store.register({ nama, phone, password });
+      if (!result.ok) {
+        showError(result.error);
         passwordInput.select();
         return;
       }
-      users[phoneNorm] = { nama: phoneNorm, password, role: 'buyer', created: new Date().toISOString() };
-      localStorage.setItem('hihujoki.users.v2', JSON.stringify(users));
-      toast('Akun berhasil dibuat! Silakan login.', 'success');
-      window.setTimeout(() => location.hash = '#/login', 600);
-    } catch (e) {
-      showError('Gagal menyimpan akun.');
+      showError('');
+      setBusy(true);
+      toast('Akun berhasil dibuat. Selamat datang!', 'success');
+      window.setTimeout(() => {
+        location.hash = `#${homePath(result.user.role)}`;
+      }, 420);
+    } catch (error) {
+      showError(error.message || 'Gagal menyimpan akun.');
     }
   }
 
@@ -100,14 +111,20 @@ export function createRegisterView() {
       novalidate: true,
       onSubmit: (event) => {
         event.preventDefault();
-        if (!phoneInput.value.trim() || !passwordInput.value) {
-          showError('Isi nomor HP dan kata sandi terlebih dahulu.');
-          (!phoneInput.value.trim() ? phoneInput : passwordInput).focus();
+        if (!nameInput.value.trim() || !phoneInput.value.trim() || !passwordInput.value) {
+          showError('Isi nama, nomor HP, dan kata sandi terlebih dahulu.');
+          (!nameInput.value.trim() ? nameInput : !phoneInput.value.trim() ? phoneInput : passwordInput).focus();
           return;
         }
-        attempt(phoneInput.value, passwordInput.value);
+        attempt(nameInput.value, phoneInput.value, passwordInput.value);
       },
     },
+    h(
+      'div',
+      { class: 'field' },
+      h('label', { for: 'reg-nama' }, 'Nama lengkap'),
+      nameInput,
+    ),
     h(
       'div',
       { class: 'field' },
@@ -135,20 +152,14 @@ export function createRegisterView() {
           type: 'button',
           style: { '--delay': `${index * 70}ms` },
           onClick: () => {
+            const exists = store.users.some((user) => user.phone === account.phone);
+            nameInput.value = account.nama;
             phoneInput.value = account.phone;
             passwordInput.value = account.password;
-            // cek apakah sudah terdaftar
-            try {
-              const users = JSON.parse(localStorage.getItem('hihujoki.users.v2') || '{}');
-              if (users[account.phone.replace(/\s/g, '')]) {
-                showError('Sudah terdaftar. Silakan login.');
-              } else {
-                phoneInput.value = account.phone;
-                passwordInput.value = account.password;
-                attempt(account.phone, account.password);
-              }
-            } catch (e) {
-              showError('Gcek status akun.');
+            if (exists) {
+              showError('Nomor HP sudah terdaftar. Silakan login.');
+            } else {
+              attempt(account.nama, account.phone, account.password);
             }
           },
         },
@@ -248,10 +259,16 @@ export function createRegisterView() {
             h('h2', null, 'Buat akun baru'),
           ),
         ),
-        h('p', { class: 'muted auth-intro' }, 'Masukkan nomor HP dan kata sandi untuk membuat akun.'),
+        h('p', { class: 'muted auth-intro' }, 'Masukkan nama, nomor HP, dan kata sandi untuk membuat akun pembeli.'),
         form,
-        h('div', { class: 'auth-divider' }, h('span', null, 'atau masuk cepak')),
-        h('div', { class: 'demo-box' }, h('div', { class: 'section-label' }, 'Akun demo · klik untuk cek'), demoList),
+        h(
+          'p',
+          { class: 'small muted auth-note' },
+          'Sudah punya akun? ',
+          h('a', { href: '#/login' }, 'Masuk di sini'),
+        ),
+        h('div', { class: 'auth-divider' }, h('span', null, 'atau masuk cepat')),
+        h('div', { class: 'demo-box' }, h('div', { class: 'section-label' }, 'Akun demo · klik untuk coba'), demoList),
         h(
           'p',
           { class: 'small muted auth-note' },

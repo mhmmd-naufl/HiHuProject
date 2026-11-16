@@ -241,6 +241,12 @@ export function createLoginView() {
         ),
         h('p', { class: 'muted auth-intro' }, 'Gunakan nomor HP terdaftar, atau pilih akun demo untuk melihat tiap peran.'),
         form,
+        h(
+          'p',
+          { class: 'small muted auth-note' },
+          'Belum punya akun? ',
+          h('a', { href: '#/register' }, 'Daftar sebagai pembeli'),
+        ),
         h('div', { class: 'auth-divider' }, h('span', null, 'atau masuk cepat')),
         h('div', { class: 'demo-box' }, h('div', { class: 'section-label' }, 'Akun demo · klik untuk masuk'), demoList),
         h(

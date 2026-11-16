@@ -49,6 +49,13 @@ function render() {
   const user = store.currentUser();
 
   if (!user) {
+    if (path === '/register') {
+      if (renderedPath !== '/register') closeDialogs();
+      renderedPath = '/register';
+      document.title = 'Daftar · HiHuJoki';
+      app.replaceChildren(createRegisterView());
+      return;
+    }
     if (path !== '/login') {
       redirect('#/login');
       return;
