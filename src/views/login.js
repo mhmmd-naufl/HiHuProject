@@ -5,9 +5,9 @@ import { store } from '../data/store.js';
 import { DEMO_ACCOUNTS } from '../data/seed.js';
 import { homePath } from '../ui/shell.js';
 import { createThemeToggle } from '../ui/theme-toggle.js';
+import { toast } from '../utils/ui.js';
 
 export function createLoginView() {
-  const errorBox = h('div', { class: 'form-error', role: 'alert', hidden: true });
   let busy = false;
   let passwordVisible = false;
 
@@ -61,13 +61,7 @@ export function createLoginView() {
   );
 
   function showError(message) {
-    errorBox.textContent = message;
-    errorBox.hidden = !message;
-    if (message) {
-      errorBox.classList.remove('is-shaking');
-      void errorBox.offsetWidth;
-      errorBox.classList.add('is-shaking');
-    }
+    if (message) toast(message, 'error');
   }
 
   function setBusy(value) {
@@ -119,7 +113,6 @@ export function createLoginView() {
       h('label', { for: 'login-password' }, 'Kata sandi'),
       h('div', { class: 'input-affix password-affix' }, passwordInput, passwordAction),
     ),
-    errorBox,
     submitButton,
   );
 
@@ -134,9 +127,13 @@ export function createLoginView() {
           type: 'button',
           style: { '--delay': `${index * 70}ms` },
           onClick: () => {
+            // Isi form saja — jangan langsung masuk hanya karena kartu demo diklik.
             phoneInput.value = account.phone;
             passwordInput.value = account.password;
-            attempt(account.phone, account.password);
+            passwordInput.type = 'password';
+            showError('');
+            submitButton.focus({ preventScroll: true });
+            toast(`Akun demo ${account.nama} sudah terisi. Tekan “Masuk” untuk melanjutkan.`, 'info');
           },
         },
         h(
@@ -248,7 +245,7 @@ export function createLoginView() {
           h('a', { href: '#/register' }, 'Daftar sebagai pembeli'),
         ),
         h('div', { class: 'auth-divider' }, h('span', null, 'atau masuk cepat')),
-        h('div', { class: 'demo-box' }, h('div', { class: 'section-label' }, 'Akun demo · klik untuk masuk'), demoList),
+        h('div', { class: 'demo-box' }, h('div', { class: 'section-label' }, 'Akun demo · klik untuk isi otomatis'), demoList),
         h(
           'p',
           { class: 'small muted auth-note' },

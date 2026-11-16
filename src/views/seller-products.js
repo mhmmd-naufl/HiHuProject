@@ -13,12 +13,8 @@ export function createSellerProductsView(ctx) {
     const isEdit = Boolean(product);
     let imageUrl = product?.imageUrl || '';
 
-    const errorBox = h('div', { class: 'form-error', role: 'alert', hidden: true });
-    const photoError = h('div', { class: 'form-error', role: 'alert', hidden: true });
-
     const showError = (message) => {
-      errorBox.textContent = message;
-      errorBox.hidden = !message;
+      if (message) toast(message, 'error');
     };
 
     const nameInput = h('input', {
@@ -101,13 +97,11 @@ export function createSellerProductsView(ctx) {
       onChange: async (event) => {
         const file = event.target.files?.[0];
         if (!file) return;
-        photoError.hidden = true;
         try {
           imageUrl = await readImageFile(file);
           renderPhoto();
         } catch (error) {
-          photoError.textContent = error.message;
-          photoError.hidden = false;
+          toast(error.message, 'error');
           event.target.value = '';
         }
       },
@@ -151,10 +145,9 @@ export function createSellerProductsView(ctx) {
       field('Kategori', categorySelect, 'Kategori dikelola di menu Kategori.'),
       h('div', { class: 'two-col' }, field('Harga (Rp)', priceInput), field('Stok', stockInput)),
       field('Deskripsi', descInput),
-      h('div', { class: 'field' }, h('label', { for: 'pf-foto' }, 'Foto produk'), photoInput, photoError),
+      h('div', { class: 'field' }, h('label', { for: 'pf-foto' }, 'Foto produk'), photoInput),
       previewWrap,
       h('label', { class: 'check' }, unggulanInput, 'Tandai sebagai produk unggulan'),
-      errorBox,
     );
 
     let dialog;

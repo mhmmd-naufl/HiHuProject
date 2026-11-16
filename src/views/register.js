@@ -8,7 +8,6 @@ import { homePath } from '../ui/shell.js';
 import { createThemeToggle } from '../ui/theme-toggle.js';
 
 export function createRegisterView() {
-  const errorBox = h('div', { class: 'form-error', role: 'alert', hidden: true });
   let busy = false;
 
   const nameInput = h('input', {
@@ -68,13 +67,7 @@ export function createRegisterView() {
   );
 
   function showError(message) {
-    errorBox.textContent = message;
-    errorBox.hidden = !message;
-    if (message) {
-      errorBox.classList.remove('is-shaking');
-      void errorBox.offsetWidth;
-      errorBox.classList.add('is-shaking');
-    }
+    if (message) toast(message, 'error');
   }
 
   function setBusy(value) {
@@ -137,7 +130,6 @@ export function createRegisterView() {
       h('label', { for: 'reg-password' }, 'Kata sandi'),
       h('div', { class: 'input-affix password-affix' }, passwordInput, passwordVisible),
     ),
-    errorBox,
     submitButton,
   );
 

@@ -4,12 +4,19 @@ import { icon } from './icons.js';
 
 let toastStack = null;
 const TOAST_ICONS = { success: 'check', error: 'alert', info: 'info' };
+const TOAST_TITLES = { success: 'Berhasil', error: 'Gagal', info: 'Informasi' };
 const TOAST_DURATION = 4200;
 
 export function toast(message, type = 'info') {
-  if (!toastStack) {
-    toastStack = h('div', { class: 'toast-stack', role: 'status', 'aria-live': 'polite' });
+  const kind = TOAST_ICONS[type] ? type : 'info';
+
+  if (!toastStack || !toastStack.isConnected) {
+    // Popover menempatkan toast di top layer, jadi tetap terlihat di atas dialog modal.
+    toastStack = h('div', { class: 'toast-stack', popover: 'manual', role: 'status', 'aria-live': 'polite' });
     document.body.append(toastStack);
+  }
+  if (typeof toastStack.showPopover === 'function' && !toastStack.matches(':popover-open')) {
+    toastStack.showPopover();
   }
 
   let timer;
@@ -25,9 +32,14 @@ export function toast(message, type = 'info') {
 
   const node = h(
     'div',
-    { class: `toast ${type}`, role: type === 'error' ? 'alert' : 'status' },
-    h('span', { class: 'toast-icon', 'aria-hidden': 'true' }, icon(TOAST_ICONS[type] || 'info', { size: 16 })),
-    h('p', { class: 'toast-message' }, message),
+    { class: `toast ${kind}`, role: kind === 'error' ? 'alert' : 'status' },
+    h('span', { class: 'toast-icon', 'aria-hidden': 'true' }, icon(TOAST_ICONS[kind], { size: 16 })),
+    h(
+      'div',
+      { class: 'toast-body' },
+      h('strong', { class: 'toast-title' }, TOAST_TITLES[kind]),
+      h('p', { class: 'toast-message' }, message),
+    ),
     h(
       'button',
       { class: 'toast-close', type: 'button', 'aria-label': 'Tutup notifikasi', onClick: dismiss },

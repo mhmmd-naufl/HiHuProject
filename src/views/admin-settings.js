@@ -5,8 +5,6 @@ import { DEMO_ACCOUNTS } from '../data/seed.js';
 import { confirmAction, field, toast } from '../utils/ui.js';
 
 export function createAdminSettingsView(ctx) {
-  const errorBox = h('div', { class: 'form-error', role: 'alert', hidden: true });
-
   const phoneInput = h('input', {
     class: 'input',
     id: 'settings-wa',
@@ -28,22 +26,19 @@ export function createAdminSettingsView(ctx) {
         try {
           const result = store.saveWhatsapp(phoneInput.value);
           if (!result.ok) {
-            errorBox.textContent = result.error;
-            errorBox.hidden = false;
+            toast(result.error, 'error');
+            phoneInput.focus({ preventScroll: true });
             return;
           }
-          errorBox.hidden = true;
           toast('Nomor WhatsApp disimpan.', 'success');
           ctx.refresh();
         } catch (error) {
-          errorBox.textContent = error.message;
-          errorBox.hidden = false;
+          toast(error.message, 'error');
         }
       },
     },
     field('Nomor WhatsApp toko', phoneInput, 'Gunakan kode negara tanpa tanda +. Contoh: 6281234567890.'),
     preview,
-    errorBox,
     h('div', null, h('button', { class: 'btn primary', type: 'submit' }, 'Simpan nomor')),
   );
 

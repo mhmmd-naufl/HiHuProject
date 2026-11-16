@@ -10,10 +10,8 @@ export function createAdminUsersView(ctx) {
 
   function openUserForm(user = null) {
     const isEdit = Boolean(user);
-    const errorBox = h('div', { class: 'form-error', role: 'alert', hidden: true });
     const showError = (message) => {
-      errorBox.textContent = message;
-      errorBox.hidden = !message;
+      if (message) toast(message, 'error');
     };
 
     const nameInput = h('input', { class: 'input', id: 'uf-nama', maxlength: '60', placeholder: 'Nama lengkap', value: user?.nama || '' });
@@ -65,7 +63,6 @@ export function createAdminUsersView(ctx) {
       field('Nomor HP', phoneInput, 'Nomor ini dipakai untuk masuk ke aplikasi. Boleh diawali 08 atau 62.'),
       h('div', { class: 'two-col' }, field('Peran', roleSelect), field(isEdit ? 'Kata sandi baru' : 'Kata sandi', passwordInput, isEdit ? 'Biarkan kosong untuk memakai kata sandi lama.' : undefined)),
       h('label', { class: 'check' }, activeInput, 'Akun aktif dan dapat masuk'),
-      errorBox,
     );
 
     let dialog;

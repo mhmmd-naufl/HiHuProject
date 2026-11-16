@@ -12,8 +12,6 @@ export function createSellerCategoriesView(ctx) {
     'aria-label': 'Nama kategori baru',
   });
 
-  const errorBox = h('div', { class: 'form-error', role: 'alert', hidden: true });
-
   const form = h(
     'form',
     {
@@ -23,21 +21,18 @@ export function createSellerCategoriesView(ctx) {
         try {
           const result = store.addCategory(input.value);
           if (!result.ok) {
-            errorBox.textContent = result.error;
-            errorBox.hidden = false;
+            toast(result.error, 'error');
+            input.focus({ preventScroll: true });
             return;
           }
-          errorBox.hidden = true;
           toast('Kategori ditambahkan.', 'success');
           ctx.refresh();
         } catch (error) {
-          errorBox.textContent = error.message;
-          errorBox.hidden = false;
+          toast(error.message, 'error');
         }
       },
     },
     h('div', { class: 'inline-form' }, input, h('button', { class: 'btn primary', type: 'submit' }, 'Tambah')),
-    errorBox,
   );
 
   async function removeCategory(category) {
