@@ -119,7 +119,6 @@ export function createShell({ user, path, view }) {
           h('span', null, ROLE_LABEL[user.role]),
         ),
       ),
-      createThemeToggle({ className: 'block' }),
       h(
         'button',
         { class: 'btn outline sm block logout-btn', type: 'button', onClick: () => { if (window.confirm('Keluar dari HiHuJoki? Klik Cancel untuk tetap login.')) { logout() } } },
@@ -128,6 +127,25 @@ export function createShell({ user, path, view }) {
       ),
     ),
   );
+
+  const shell = h(
+    'div',
+    { class: 'app-shell' },
+    sidebar,
+    h(
+      'div',
+      { class: 'main' },
+      h(
+        'div',
+        { class: 'theme-wrapper' },
+        createThemeToggle({ className: 'block' }),
+      ),
+      mobileBar,
+      mobileNav,
+      h('main', { class: 'content' }, view),
+    ),
+  );
+
 
   const mobileBar = h(
     'div',
