@@ -1,5 +1,6 @@
 import { h, initials } from '../utils/dom.js';
 import { number, ROLE_LABEL } from '../utils/format.js';
+import { icon } from '../utils/icons.js';
 import { store } from '../data/store.js';
 import { createThemeToggle } from './theme-toggle.js';
 
@@ -16,16 +17,16 @@ function navigationFor(user) {
     groups.push({
       label: 'Admin',
       links: [
-        { path: '/admin', label: 'Dashboard' },
-        { path: '/pengguna', label: 'Pengguna', count: store.users.length },
-        { path: '/analitik', label: 'Analitik' },
+        { path: '/admin', label: 'Dashboard', icon: 'dashboard' },
+        { path: '/pengguna', label: 'Pengguna', icon: 'users', count: store.users.length },
+        { path: '/analitik', label: 'Analitik', icon: 'chart' },
       ],
     });
     groups.push({
       label: 'Toko',
       links: [
-        { path: '/katalog', label: 'Katalog' },
-        { path: '/pengaturan', label: 'Pengaturan' },
+        { path: '/katalog', label: 'Katalog', icon: 'store' },
+        { path: '/pengaturan', label: 'Pengaturan', icon: 'settings' },
       ],
     });
   } else if (user.role === 'seller') {
@@ -33,25 +34,25 @@ function navigationFor(user) {
     groups.push({
       label: 'Toko saya',
       links: [
-        { path: '/produk', label: 'Produk', count: mine },
-        { path: '/kategori', label: 'Kategori' },
+        { path: '/produk', label: 'Produk', icon: 'box', count: mine },
+        { path: '/kategori', label: 'Kategori', icon: 'tags' },
       ],
     });
     groups.push({
       label: 'Jelajah',
-      links: [{ path: '/katalog', label: 'Katalog' }],
+      links: [{ path: '/katalog', label: 'Katalog', icon: 'store' }],
     });
   } else {
     groups.push({
       label: 'Belanja',
-      links: [{ path: '/katalog', label: 'Katalog produk' }],
+      links: [{ path: '/katalog', label: 'Katalog produk', icon: 'store' }],
     });
   }
 
   return groups;
 }
 
-function navLink({ path, label, count, active }) {
+function navLink({ path, label, icon: iconName, count, active }) {
   return h(
     'a',
     {
@@ -59,7 +60,8 @@ function navLink({ path, label, count, active }) {
       href: `#${path}`,
       'aria-current': active ? 'page' : null,
     },
-    h('span', null, label),
+    h('span', { class: 'nav-icon', 'aria-hidden': 'true' }, icon(iconName || 'box', { size: 17 })),
+    h('span', { class: 'nav-text' }, label),
     count === undefined ? null : h('span', { class: 'nav-count' }, number(count)),
   );
 }
@@ -118,7 +120,12 @@ export function createShell({ user, path, view }) {
         ),
       ),
       createThemeToggle({ className: 'block' }),
-      h('button', { class: 'btn outline sm block', type: 'button', onClick: logout }, 'Keluar'),
+      h(
+        'button',
+        { class: 'btn outline sm block logout-btn', type: 'button', onClick: logout },
+        h('span', { 'aria-hidden': 'true' }, icon('logout', { size: 15 })),
+        'Keluar',
+      ),
     ),
   );
 
@@ -141,7 +148,7 @@ export function createShell({ user, path, view }) {
         ),
       ),
       createThemeToggle({ compact: true }),
-      h('button', { class: 'btn ghost sm', type: 'button', onClick: logout }, 'Keluar'),
+      h('button', { class: 'btn ghost sm', type: 'button', onClick: logout, 'aria-label': 'Keluar dari akun' }, h('span', { 'aria-hidden': 'true' }, icon('logout', { size: 15 }))),
     ),
   );
 

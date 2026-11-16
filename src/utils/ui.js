@@ -1,22 +1,61 @@
 import { h } from './dom.js';
 import { placeholderTone } from './format.js';
+import { icon } from './icons.js';
 
 let toastStack = null;
+const TOAST_ICONS = { success: 'check', error: 'alert', info: 'info' };
+const TOAST_DURATION = 4200;
 
 export function toast(message, type = 'info') {
   if (!toastStack) {
     toastStack = h('div', { class: 'toast-stack', role: 'status', 'aria-live': 'polite' });
     document.body.append(toastStack);
   }
-  const node = h('div', { class: `toast ${type}` }, message);
+
+  let timer;
+  let remaining = TOAST_DURATION;
+  let startedAt = Date.now();
+
+  const dismiss = () => {
+    window.clearTimeout(timer);
+    if (!node.isConnected || node.classList.contains('is-leaving')) return;
+    node.classList.add('is-leaving');
+    window.setTimeout(() => node.remove(), 220);
+  };
+
+  const node = h(
+    'div',
+    { class: `toast ${type}`, role: type === 'error' ? 'alert' : 'status' },
+    h('span', { class: 'toast-icon', 'aria-hidden': 'true' }, icon(TOAST_ICONS[type] || 'info', { size: 16 })),
+    h('p', { class: 'toast-message' }, message),
+    h(
+      'button',
+      { class: 'toast-close', type: 'button', 'aria-label': 'Tutup notifikasi', onClick: dismiss },
+      '×',
+    ),
+    h('span', { class: 'toast-progress', 'aria-hidden': 'true' }),
+  );
+
+  while (toastStack.children.length >= 4) toastStack.firstElementChild.remove();
   toastStack.append(node);
-  window.setTimeout(() => node.remove(), 3800);
+
+  timer = window.setTimeout(dismiss, remaining);
+  node.addEventListener('mouseenter', () => {
+    window.clearTimeout(timer);
+    remaining = Math.max(1200, remaining - (Date.now() - startedAt));
+  });
+  node.addEventListener('mouseleave', () => {
+    startedAt = Date.now();
+    timer = window.setTimeout(dismiss, remaining);
+  });
 }
 
 export function openDialog({ title, subtitle, body, actions = [], width, onClose }) {
   let dialog;
   const close = () => {
-    if (dialog?.open) dialog.close();
+    if (!dialog?.open || dialog.classList.contains('is-closing')) return;
+    dialog.classList.add('is-closing');
+    window.setTimeout(() => dialog.close(), 150);
   };
 
   dialog = h(
@@ -39,6 +78,10 @@ export function openDialog({ title, subtitle, body, actions = [], width, onClose
 
   dialog.addEventListener('click', (event) => {
     if (event.target === dialog) close();
+  });
+  dialog.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    close();
   });
   dialog.addEventListener('close', () => {
     dialog.remove();

@@ -1,3 +1,151 @@
+/* Add after existing :root variables */
+:root {
+  --transition-fast: .12s ease;
+  --transition-normal: .18s ease;
+  --transition-slow: .28s ease;
+  --toast-width: 320px;
+}
+
+/* Animated form field entrance */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .6; }
+}
+
+/* Toast entry/exit */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(8px); }
+}
+
+/* Login button entrance */
+@keyframes slideBottomIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Panel slide */
+@keyframes slideInFromRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Chart bar animations */
+@keyframes barGrow {
+  from { width: 0%; }
+  to { width: var(--bar-width); }
+}
+
+/* SVG icon color overrides */
+html[data-theme="dark"] .toast-icon { filter: invert(20%) sepia(50%) saturate(300%) hue-rotate(150deg) brightness(1.1) contrast(0.9); }
+html[data-theme="dark"] .toast-error .toast-icon { filter: invert(90%) sepia(20%) saturate(100%) hue-rotate(15deg) brightness(1.2) contrast(1.1); }
+
+/* Button transitions */
+.btn { transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+.btn:active { transform: translateY(0); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Focus ring */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Auth card */
+.auth-card { transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+.auth-card:hover { border-color: var(--accent); box-shadow: 0 24px 48px -12px rgba(32,37,31,.2); }
+
+/* Stats entrance stagger */
+.stats > * { animation: fadeSlideIn var(--transition-normal) var(--transition-normal) backwards; }
+.stats .stat:nth-child(1) { animation-delay: 0ms; }
+.stats .stat:nth-child(2) { animation-delay: 60ms; }
+.stats .stat:nth-child(3) { animation-delay: 120ms; }
+.stats .stat:nth-child(4) { animation-delay: 180ms; }
+.stats .stat:nth-child(5) { animation-delay: 240ms; }
+
+/* Panel slide-in */
+.panel { animation: slideInFromRight var(--transition-normal) backwards; }
+.panel:first-child { animation-delay: 0ms; }
+.panel:nth-child(2) { animation-delay: 80ms; }
+.panel:nth-child(3) { animation-delay: 160ms; }
+
+/* Empty state */
+.empty { transition: border-color var(--transition-fast), background var(--transition-fast); }
+.empty:hover { border-color: var(--muted); }
+
+/* SVG icon transitions */
+svg.icon { transition: fill var(--transition-fast), stroke var(--transition-fast); }
+
+/* Toast styles */
+.toast-stack { transition: right-bottom var(--transition-fast); }
+.toast { animation: toastIn var(--transition-fast) ease-out forwards; box-shadow: 0 18px 40px -18px rgba(0,0,0,.5); }
+.toast.error { background: #7f1d1d; }
+.toast.success { background: #14532d; }
+.toast.info { background: var(--ink); }
+.toast { padding: 12px 14px; }
+.toast .toast-icon { flex-shrink: 0; margin-right: 8px; width: 16px; height: 16px; }
+.toast .toast-message { flex: 1; font-size: 13px; line-height: 1.4; white-space: normal; }
+.toast .toast-close { width: 20px; height: 20px; padding: 0; font-size: 14px; line-height: 1; color: rgba(255,255,255,.6); }
+.toast .toast-close:hover { color: #fff; }
+.toast .toast-progress { position: absolute; left: 0; bottom: 0; height: 2px; background: currentColor; opacity: 0.3; }
+.toast.is-leaving { animation: toastOut var(--transition-fast) ease-in forwards; }
+
+/* Login form entrance */
+.auth-form { animation: slideBottomIn var(--transition-fast) ease-out backwards; }
+.auth-form .field:nth-child(1) { animation-delay: 0ms; }
+.auth-form .field:nth-child(2) { animation-delay: 40ms; }
+.auth-form .field:nth-child(3) { animation-delay: 80ms; }
+.auth-form .field:nth-child(4) { animation-delay: 120ms; }
+
+/* Demo accounts staggered */
+.demo-list .demo-account { animation: scaleIn var(--transition-fast) ease-out backwards; }
+.demo-list .demo-account:nth-child(1) { animation-delay: 0ms; }
+.demo-list .demo-account:nth-child(2) { animation-delay: 50ms; }
+.demo-list .demo-account:nth-child(3) { animation-delay: 100ms; }
+
+/* Chart bar transitions */
+.bar-fill { transition: width var(--transition-normal) ease-out; }
+.bar-group { transition: gap var(--transition-normal); }
+
+/* Nav link transitions */
+.nav-link { transition: background var(--transition-fast), color var(--transition-fast); }
+.nav-link.active { transition: background var(--transition-normal), color var(--transition-normal); }
+.nav-link:hover { background: var(--soft-2); color: var(--ink); }
+.nav-link.active:hover { background: var(--accent-soft); color: var(--accent-dark); }
+
+/* Search input focus */
+.input:focus, .select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(66,122,99,.12); }
+
+/* Avatar */
+.avatar { transition: background var(--transition-fast); }
+.avatar:hover { background: var(--accent-soft); }
+
+/* Theme toggle */
+.theme-toggle { transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast); }
+.theme-toggle:hover { background: var(--soft-2); }
+
+/* Table row */
+.table-wrap table tbody tr { transition: background var(--transition-fast); }
+.table-wrap table tbody tr:hover { background: var(--soft); }
+
+/* Dialog backdrop transition */
+dialog { transition: box-shadow var(--transition-fast); }
+dialog.is-closing { transition: opacity var(--transition-fast); }
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0ms !important; transition-duration: 0ms !important; }
+}
 :root {
   --ink: #20251f;
   --ink-soft: #4a524b;
